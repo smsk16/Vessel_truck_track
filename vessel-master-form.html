@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vessel Master Form</title>
+  <style>
+    :root { --navy:#11324d; --blue:#1f6b99; --mist:#eef4f7; --line:#c9d7df; --ink:#1e2932; --muted:#60717d; }
+    * { box-sizing: border-box; }
+    body { margin:0; background:#f5f8fa; color:var(--ink); font:15px/1.4 Arial, sans-serif; }
+    header { background:linear-gradient(120deg,var(--navy),#195b80); color:white; padding:32px 24px; }
+    header div, main { max-width:1120px; margin:auto; }
+    h1 { margin:0 0 5px; font-size:28px; }
+    header p { margin:0; opacity:.86; }
+    main { padding:26px 24px 46px; }
+    .notice { color:var(--muted); margin:0 0 20px; }
+    form { background:white; border:1px solid var(--line); border-radius:10px; overflow:hidden; box-shadow:0 3px 16px #11324d12; }
+    section { padding:22px 24px; border-bottom:1px solid var(--line); }
+    section:last-of-type { border:0; }
+    h2 { color:var(--navy); font-size:18px; margin:0 0 17px; }
+    [hidden] { display:none !important; }
+    .list-header,.form-header { display:flex; justify-content:space-between; align-items:flex-start; gap:18px; margin-bottom:18px; }
+    .list-header h2,.form-header h2 { font-size:22px; margin-bottom:5px; }
+    .table-wrap { overflow-x:auto; background:#fff; border:1px solid var(--line); border-radius:10px; box-shadow:0 3px 16px #11324d12; }
+    table { border-collapse:collapse; width:100%; min-width:720px; }
+    th { text-align:left; font-size:12px; text-transform:uppercase; letter-spacing:.04em; color:#47606f; background:var(--mist); }
+    th,td { padding:14px 16px; border-bottom:1px solid #dce5ea; vertical-align:middle; }
+    tbody tr:last-child td { border-bottom:0; } small { color:var(--muted); } .empty { color:var(--muted); text-align:center; padding:34px; }
+    .status { display:inline-block; padding:3px 8px; border-radius:99px; background:#e3f1e9; color:#25633f; font-size:12px; font-weight:700; }
+    .row-actions { white-space:nowrap; } .link-button { border:0; background:none; color:#0e5d88; cursor:pointer; font-weight:700; padding:4px 7px; } .link-button.delete { color:#b42318; }
+    .grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:15px 18px; }
+    .wide { grid-column:span 2; } .full { grid-column:1 / -1; }
+    label { display:block; font-weight:700; font-size:13px; color:#334955; }
+    label span { color:#b42318; }
+    input, select, textarea { width:100%; margin-top:6px; padding:10px 11px; border:1px solid #aebfc9; border-radius:5px; background:white; color:var(--ink); font:inherit; }
+    input:focus, select:focus, textarea:focus { outline:3px solid #d7edf8; border-color:var(--blue); }
+    textarea { min-height:74px; resize:vertical; }
+    .actions { display:flex; justify-content:flex-end; align-items:center; gap:12px; padding:18px 24px; background:var(--mist); }
+    button { border:0; border-radius:5px; padding:11px 17px; cursor:pointer; font-weight:700; font-size:14px; }
+    .secondary { background:white; border:1px solid #9fb1bd; color:#314956; }
+    .primary { background:var(--navy); color:#fff; }
+    #message { margin-right:auto; color:#276644; font-weight:700; }
+    @media (max-width:760px) { .grid { grid-template-columns:1fr; } .wide,.full { grid-column:auto; } header { padding:25px 18px; } main { padding:20px 14px 30px; } section { padding:20px 16px; } .list-header,.form-header { display:block; } .list-header button,.form-header button { margin-top:12px; } }
+    @media print { body { background:white; } header { padding:14px 0; color:#000; background:white; } main { padding:10px 0; } form { border:0; box-shadow:none; } .actions,.notice { display:none; } input,select,textarea { border:1px solid #9aa; } }
+  </style>
+</head>
+<body>
+  <header><div><h1>Vessel Master</h1><p>Maintain vessel identification, ownership, technical, capacity and compliance details.</p></div></header>
+  <main>
+    <div id="recordsView">
+      <div class="list-header"><div><h2>Vessel records</h2></div><button type="button" class="primary" id="createRecord">+ Create vessel record</button></div>
+      <div class="table-wrap"><table><thead><tr><th>Vessel</th><th>IMO number</th><th>Type</th><th>Flag</th><th>Status</th><th aria-label="Actions">Actions</th></tr></thead><tbody id="recordsTable"></tbody></table></div>
+    </div>
+    <div id="formView" hidden>
+    <div class="form-header"><div><h2 id="formTitle">Create vessel record</h2><p class="notice">Fields marked <strong>*</strong> are required.</p></div><button type="button" class="secondary" id="backToList">← Back to records</button></div>
+    <form id="vesselForm">
+      <section><h2>1. Vessel identification</h2><div class="grid">
+        <label>Vessel name <span>*</span><input name="vesselName" required></label>
+        <label>IMO number <span>*</span><input name="imo" inputmode="numeric" pattern="[0-9]{7}" title="Enter the 7-digit IMO number" placeholder="e.g. 1234567" required></label>
+        <label>Vessel ID / internal code<input name="vesselId"></label>
+        <label>Call sign<input name="callSign"></label><label>MMSI<input name="mmsi" inputmode="numeric"></label>
+        <label>Vessel status <span>*</span><select name="status" required><option value="">Select status</option><option>Active</option><option>Laid-up</option><option>Under construction</option><option>Sold</option><option>Scrapped</option></select></label>
+      </div></section>
+      <section><h2>2. Registry and management</h2><div class="grid">
+        <label>Flag / registry country <span>*</span><input name="flag" required></label><label>Port of registry<input name="portRegistry"></label><label>Classification society<input name="classSociety"></label>
+        <label>Owner <span>*</span><input name="owner" required></label><label>Operator<input name="operator"></label><label>Technical manager<input name="manager"></label>
+      </div></section>
+      <section><h2>3. Vessel characteristics</h2><div class="grid">
+        <label>Vessel type <span>*</span><select name="type" required><option value="">Select type</option><option>Bulk carrier</option><option>Container ship</option><option>Cruise ship</option><option>General cargo</option><option>LNG carrier</option><option>Oil tanker</option><option>Oil products tanker</option><option>Offshore vessel</option><option>Ro-Ro vessel</option><option>Other</option></select></label>
+        <label>Vessel subtype<input name="subtype"></label><label>Year built<input name="yearBuilt" type="number" min="1800" max="2100"></label>
+        <label>Builder / shipyard<input name="builder"></label><label>Hull number<input name="hullNumber"></label><label>Crew capacity<input name="crewCapacity" type="number" min="0"></label>
+      </div></section>
+      <section><h2>4. Dimensions and tonnage</h2><div class="grid">
+        <label>Gross tonnage (GT)<input name="gt" type="number" min="0" step="0.01"></label><label>Net tonnage (NT)<input name="nt" type="number" min="0" step="0.01"></label><label>Deadweight (DWT, tonnes)<input name="dwt" type="number" min="0" step="0.01"></label>
+        <label>Length overall (m)<input name="loa" type="number" min="0" step="0.01"></label><label>Beam (m)<input name="beam" type="number" min="0" step="0.01"></label><label>Maximum draft (m)<input name="draft" type="number" min="0" step="0.01"></label>
+      </div></section>
+      <section><h2>5. Machinery, performance and capacity</h2><div class="grid">
+        <label>Main engine / propulsion<input name="engine"></label><label>Engine power (kW)<input name="power" type="number" min="0"></label><label>Service speed (knots)<input name="speed" type="number" min="0" step="0.1"></label>
+        <label>Cargo capacity<input name="cargoCapacity" placeholder="e.g. 50,000 tonnes"></label><label>Container capacity (TEU)<input name="teu" type="number" min="0"></label><label>Tank capacity<input name="tankCapacity" placeholder="if applicable"></label>
+      </div></section>
+      <section><h2>6. Surveys and compliance</h2><div class="grid">
+        <label>Last dry dock date<input name="lastDryDock" type="date"></label><label>Next dry dock due<input name="nextDryDock" type="date"></label><label>Last class survey<input name="lastSurvey" type="date"></label>
+        <label>Next class survey due<input name="nextSurvey" type="date"></label><label>Safety certificate expiry<input name="safetyExpiry" type="date"></label><label>Insurance expiry<input name="insuranceExpiry" type="date"></label>
+        <label class="full">Notes / special restrictions<textarea name="notes" placeholder="Add operational constraints, certificate references, or other relevant information."></textarea></label>
+      </div></section>
+      <div class="actions"><span id="message" role="status"></span><button type="reset" class="secondary">Clear form</button><button type="submit" class="primary">Save record</button></div>
+    </form>
+    </div>
+  </main>
+  <script>
+    const form = document.getElementById('vesselForm'), key = 'vesselMasterRecords', seedKey = 'vesselMasterSamplesV1', message = document.getElementById('message');
+    const recordsView = document.getElementById('recordsView'), formView = document.getElementById('formView'), tbody = document.getElementById('recordsTable');
+    let records = JSON.parse(localStorage.getItem(key) || '[]'), editingId = null;
+    const sampleRecords = [
+      ['FLAG LAMA','9474711','Bulk carrier','Marshall Islands',2017,'538006963','V7QE5'], ['FLAGSHIP','9515424','Oil products tanker','Singapore',2009,'563038000','9VME2'],
+      ['COSCO SHIPPING SOLAR','9795646','Container ship','Hong Kong',2019,'477302900','VRSO4'], ['MSC ALBA F','9499010','Container ship','Liberia',2008,'636021870','5LGC3'],
+      ['MORNING SUN','9110183','Oil products tanker','Panama',1996,'352314000','3FFS4'], ['FLAG MARINA','9384928','Bulk carrier','Panama',2008,'',''],
+      ['FLAG ZANNIS','9474682','Bulk carrier','Marshall Islands',2010,'',''], ['FLAG SEAMAN','9605499','Bulk carrier','Malta',2013,'229243000','9HA3168'],
+      ['FLAG TOM','9496630','Bulk carrier','Liberia',2011,'636015988','D5DW4'], ['EVER ACE','9893890','Container ship','Panama',2021,'352986146','3E2382'],
+      ['MSC TESSA','9930038','Container ship','Liberia',2023,'636022102',''], ['MSC GEMMA','9936616','Container ship','Liberia',2023,'636022603',''],
+      ['OOCL SPAIN','9908126','Container ship','Hong Kong',2023,'477871600',''], ['OOCL HONG KONG','9776171','Container ship','Hong Kong',2017,'',''],
+      ['CMA CGM JACQUES SAADE','9839179','Container ship','France',2020,'',''], ['MSC GULSUN','9839430','Container ship','Panama',2019,'',''],
+      ['HMM ALGECIRAS','9863297','Container ship','Panama',2020,'',''], ['MADRID MAERSK','9778791','Container ship','Denmark',2017,'',''],
+      ['MSC OSCAR','9703291','Container ship','Panama',2015,'',''], ['CMA CGM ANTOINE DE SAINT EXUPERY','9776418','Container ship','France',2018,'','']
+    ].map(([vesselName,imo,type,flag,yearBuilt,mmsi,callSign], index) => ({ id:`sample-${imo}`, vesselId:`SAMPLE-${String(index + 1).padStart(3,'0')}`, vesselName, imo, type, flag, yearBuilt, mmsi, callSign, status:'Active', notes:'Sample public AIS/registry reference record, seeded July 2026.' }));
+    const escape = value => String(value || '—').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+    function persist() { localStorage.setItem(key, JSON.stringify(records)); }
+    function renderRecords() {
+      tbody.innerHTML = records.length ? records.map(r => `<tr><td><strong>${escape(r.vesselName)}</strong><br><small>${escape(r.vesselId)}</small></td><td>${escape(r.imo)}</td><td>${escape(r.type)}</td><td>${escape(r.flag)}</td><td><span class="status">${escape(r.status)}</span></td><td class="row-actions"><button type="button" class="link-button" data-edit="${r.id}">Modify</button><button type="button" class="link-button delete" data-delete="${r.id}">Delete</button></td></tr>`).join('') : '<tr><td class="empty" colspan="6">No vessel records yet. Use “Create vessel record” to add one.</td></tr>';
+    }
+    function showForm(record) {
+      form.reset(); editingId = record?.id || null; document.getElementById('formTitle').textContent = record ? 'Modify vessel record' : 'Create vessel record';
+      if (record) Object.entries(record).forEach(([name,value]) => { if (form.elements[name]) form.elements[name].value = value; });
+      recordsView.hidden = true; formView.hidden = false; window.scrollTo(0, 0);
+    }
+    function showList() { formView.hidden = true; recordsView.hidden = false; message.textContent = ''; renderRecords(); }
+    document.getElementById('createRecord').onclick = () => showForm(); document.getElementById('backToList').onclick = showList;
+    tbody.addEventListener('click', e => { const id = e.target.dataset.edit || e.target.dataset.delete; if (!id) return; const record = records.find(r => r.id === id); if (e.target.dataset.edit) showForm(record); else if (confirm(`Delete ${record.vesselName}? This cannot be undone.`)) { records = records.filter(r => r.id !== id); persist(); renderRecords(); } });
+    form.addEventListener('reset', () => { message.textContent = 'Form cleared.'; });
+    form.addEventListener('submit', e => { e.preventDefault(); if (!form.reportValidity()) return; const record = {...Object.fromEntries(new FormData(form)), id: editingId || crypto.randomUUID()}; if (editingId) records = records.map(r => r.id === editingId ? record : r); else records.push(record); persist(); showList(); });
+    if (!localStorage.getItem(seedKey)) { records = [...records, ...sampleRecords.filter(sample => !records.some(record => record.imo === sample.imo))]; persist(); localStorage.setItem(seedKey, 'true'); }
+    renderRecords();
+  </script>
+</body>
+</html>
